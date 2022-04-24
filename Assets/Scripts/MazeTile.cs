@@ -39,6 +39,7 @@ public class MazeTile : MonoBehaviour
 
     private void OnShowDepthChanged()
     {
+        if (_cell == null) return;
         if(_spriteRenderer == null)
         {
             _spriteRenderer = GetComponent<SpriteRenderer>();

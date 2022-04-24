@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Threading.Tasks;
 
 public class Maze
 {
@@ -15,10 +16,11 @@ public class Maze
     /// If the Maze was able to be solved
     /// </summary>
     public bool Solved { get; private set; }
+    public string Error { get; private set; }
 
     //These correspond to N, E, S, W, in that order.
     // North is 0,-1 because our coordinate system starts at the top
-    private Vector2Int[] cardinals = new Vector2Int[] {
+    public static Vector2Int[] Cardinals = new Vector2Int[] {
         Vector2Int.down,
         Vector2Int.right,
         Vector2Int.up,
@@ -53,14 +55,16 @@ public class Maze
         if((asciiRows[0].Length - 1) % 3 != 0 ||
             (asciiRows.Length - 1) % 2 != 0)
         {
-            Debug.LogError("Maze is in invalid format and can not be parsed!");
+            Error = "Maze is in invalid format and can not be parsed!";
+            Debug.LogError(Error);
             return;
         }
 
         //check if all the rows are the same length
         if(asciiRows.GroupBy(e => e.Length).ToList().Count > 1)
         {
-            Debug.LogError("Not all lines in the maze are the same length. Maze can not be parsed!");
+            Error = "Not all lines in the maze are the same length. Maze can not be parsed!";
+            Debug.LogError(Error);
             return;
         }
 
@@ -101,7 +105,8 @@ public class Maze
         }
         else
         {
-            Debug.LogError("Maze could not be solved!");
+            Error = "Maze is unsolvable!\nMake sure there is a continuous path from the top-left to the bottom-right.";
+            Debug.LogError(Error);
         }
     }
 
@@ -122,7 +127,7 @@ public class Maze
         while (currentCell != null)
         {
             if (currentCell == Entrance) foundEntrance = true;
-            if (currentCell.NumExits <= 1) //dead end
+            if (currentCell.NumExits <= 1 && currentCell != startCell) //dead end
             {
                 break;
             }
@@ -171,7 +176,7 @@ public class Maze
         {
             if (!cell.Walls[i])
             {
-                nextPos = cell.Position + cardinals[i];
+                nextPos = cell.Position + Cardinals[i];
                 if(!isInGrid(nextPos.x, nextPos.y))
                 {
                     //outside the bounds of the maze
@@ -189,12 +194,14 @@ public class Maze
 
     #endregion
 
-    public static Maze LoadMaze(string asciiMaze)
+    public static async Task<Maze> LoadMaze(string asciiMaze)
     {
         string[] mazeRows = asciiMaze.Split(new char[] {'\n','\r'}, System.StringSplitOptions.RemoveEmptyEntries);
 
-        Maze m = new Maze(mazeRows);
-        return m;
+        Task<Maze> loadMazeTask = Task.Run(() => { Maze m = new Maze(mazeRows);  return m; });
+        await loadMazeTask;
+        return loadMazeTask.Result;
+        
     }
 
     public MazeCell GetCell(Vector2Int position)
@@ -227,7 +234,7 @@ public class Maze
         {
             if (!currentCell.Walls[i])
             {
-                nextPos = currentCell.Position + cardinals[i];
+                nextPos = currentCell.Position + Cardinals[i];
                 if (!isInGrid(nextPos.x, nextPos.y))
                 {
                     //outside the bounds of the maze
