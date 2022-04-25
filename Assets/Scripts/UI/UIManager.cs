@@ -81,6 +81,8 @@ public class UIManager : MonoBehaviour
 
 	public void LoadCustomMaze()
 	{
+		FileBrowser.SetFilters(true, ".txt");
+		FileBrowser.SetDefaultFilter(".txt");
 		FileBrowser.ShowLoadDialog(onLoadSuccess, ()=> { }, FileBrowser.PickMode.Files, title: "Pick ascii maze file");
 	}
 

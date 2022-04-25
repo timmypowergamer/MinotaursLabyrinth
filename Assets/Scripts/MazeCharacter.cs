@@ -66,6 +66,7 @@ public class MazeCharacter : MonoBehaviour
             //Admittedly, this is not a great practice.
             // It's to catch a specific case where the character is destroyed while the Delay task is still going.
             // But I'm not spending any more time right now on this...
+            Debug.Log($"Exception of type '{e.GetType()}' was caught because Character was destroyed while solving maze");
         }
         IsSolving = false;
     }
