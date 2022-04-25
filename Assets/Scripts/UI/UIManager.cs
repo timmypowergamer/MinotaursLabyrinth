@@ -106,4 +106,9 @@ public class UIManager : MonoBehaviour
 	{
 		ErrorDialog.SetActive(false);
 	}
+
+	public void QuitGamePressed()
+	{
+		Application.Quit();
+	}
 }

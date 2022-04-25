@@ -102,6 +102,15 @@ public class Maze
         if (walkBranch(startCell))
         {
             Solved = true;
+            //Calculate max depth here. I used to do it while walking the map, but it's inaccurate when the map has closed loops inside it.
+            // makes for a marginally longer wait, but better UX
+            for (int y = 0; y < SizeY; y++)
+            {
+                for (int x = 0; x < SizeX; x++)
+                {
+                    if (CellGrid[x,y].Depth > MaxDepth) MaxDepth = CellGrid[x, y].Depth;
+                }
+            }
         }
         else
         {
@@ -137,7 +146,6 @@ public class Maze
                 if(nextCell != null)
                 {
                     depth++;
-                    if (depth > MaxDepth) MaxDepth = depth;
                     nextCell.Depth = depth;
                     currentCell = nextCell;                    
                     continue;
@@ -150,7 +158,6 @@ public class Maze
                 while(nextCell != null)
                 {
                     nextCell.Depth = depth + 1;
-                    if (depth > MaxDepth) MaxDepth = depth;
                     if (walkBranch(nextCell))
                     {
                         foundEntrance = true;
